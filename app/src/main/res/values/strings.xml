@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">WeitherLoop</string>
+    <string name="how_is_weather">Quel temps fait-il en France ?</string>
+    <string name="lets_see">Allons voir !</string>
+    <string name="weatherActivityTitle">Quel temps fait-il ?</string>
+</resources>
