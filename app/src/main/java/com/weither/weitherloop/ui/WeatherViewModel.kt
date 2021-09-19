@@ -4,20 +4,29 @@ import android.os.CountDownTimer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.weither.weitherloop.domain.Result
+import com.weither.weitherloop.domain.usecase.CurrentCityWeatherResult
 import com.weither.weitherloop.domain.usecase.GetCurrentCityWeatherUseCase
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.util.*
-import kotlin.concurrent.schedule
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import java.util.* // ktlint-disable no-wildcard-imports
 import javax.inject.Inject
+import kotlin.concurrent.schedule
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     val getCurrentCityWeatherUseCase: GetCurrentCityWeatherUseCase
 ) : ViewModel() {
 
-    val listOfCity = arrayListOf("First", "Second", "Three")
+    val listCurrentWeather: MutableLiveData<MutableList<CurrentCityWeatherResult>> =
+        MutableLiveData(
+            mutableListOf()
+        )
+    val currentWeatherError: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    val listOfCity = arrayListOf("Rennes", "Paris", "Nantes", "Bordeaux", "Lyon", "Montpellier")
 
     var label: MutableLiveData<String>? = MutableLiveData("")
     var progress: MutableLiveData<Double> = MutableLiveData(0.0)
@@ -40,6 +49,8 @@ class WeatherViewModel @Inject constructor(
         ) {
 
             println("Call API " + listOfCity[iterator])
+            getWeather(listOfCity[iterator])
+
             iterator++
             if (iterator == listOfCity.size) {
                 this.cancel()
@@ -69,6 +80,31 @@ class WeatherViewModel @Inject constructor(
                     delay(6000)
                 }
                 repeatLabel()
+            }
+        }
+    }
+
+    fun getWeather(nameCity: String) {
+        viewModelScope.launch {
+            getCurrentCityWeatherUseCase(nameCity).collect {
+
+                when (it) {
+                    is Result.Loading -> println("API loading")
+                    is Result.Error -> {
+                        println("error")
+                        currentWeatherError.postValue(true)
+                    }
+
+                    is Result.Success -> {
+                        println("success")
+                        it.data?.let { item ->
+                            listCurrentWeather.value?.add(item)
+                            println("dataaa $item")
+                        }
+                        currentWeatherError.postValue(false)
+                        println("List response: ${listCurrentWeather.value}")
+                    }
+                }
             }
         }
     }
