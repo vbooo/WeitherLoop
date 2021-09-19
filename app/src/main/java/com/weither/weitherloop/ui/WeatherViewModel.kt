@@ -1,15 +1,21 @@
-package com.weither.weitherloop
+package com.weither.weitherloop.ui
 
 import android.os.CountDownTimer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.weither.weitherloop.domain.usecase.GetCurrentCityWeatherUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.concurrent.schedule
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class WeatherViewModel : ViewModel() {
+@HiltViewModel
+class WeatherViewModel @Inject constructor(
+    val getCurrentCityWeatherUseCase: GetCurrentCityWeatherUseCase
+) : ViewModel() {
 
     val listOfCity = arrayListOf("First", "Second", "Three")
 
