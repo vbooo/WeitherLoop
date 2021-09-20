@@ -28,7 +28,7 @@ class CityRepositoryImpl @Inject constructor(
                     temp = data.main?.temp,
                     temp_min = data.main?.temp_min,
                     temp_max = data.main?.temp_max,
-                    cloudPercentage = data.cloud?.percentage
+                    cloudPercentage = data.clouds?.all
                 )
             }
             else -> null

@@ -26,17 +26,26 @@ class WeatherViewModel @Inject constructor(
         )
     val currentWeatherError: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    val countDownIsFinished: MutableLiveData<Boolean> = MutableLiveData(false)
+
     val listOfCity = arrayListOf("Rennes", "Paris", "Nantes", "Bordeaux", "Lyon", "Montpellier")
 
     var label: MutableLiveData<String>? = MutableLiveData("")
     var progress: MutableLiveData<Double> = MutableLiveData(0.0)
     var tabLabel = arrayListOf(
         "Nous téléchargeons les données...",
-        "C’est presque fini...",
-        "Plus que quelques secondes avant d’avoir le résultat..."
+        "C'est presque fini...",
+        "Plus que quelques secondes avant d'avoir le résultat..."
     )
 
     init {
+        launchWeatherLoop()
+    }
+
+    fun launchWeatherLoop() {
+        progress.value = 0.0
+        countDownIsFinished.value = false
+        listCurrentWeather.value?.clear()
         repeatLabel()
         getCitiesWeather()
         handleProgressBar()
@@ -67,7 +76,8 @@ class WeatherViewModel @Inject constructor(
             }
 
             override fun onFinish() {
-                println("FINISH")
+                println("FINISH $progress")
+                countDownIsFinished.value = true
             }
         }.start()
     }
